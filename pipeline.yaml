@@ -1,0 +1,30 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: cd-pipeline
+spec:
+  workspaces:
+    - name: pipeline-workspace
+  tasks:
+    - name: npm-install
+      taskRef:
+        name: npm
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
+    - name: tests
+      taskRef:
+        name: jasmine
+      runAfter:
+        - npm-install
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
+    - name: build
+      taskRef:
+        name: buildah
+      runAfter:
+        - tests
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
